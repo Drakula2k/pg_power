@@ -9,7 +9,7 @@ module ActiveRecord # :nodoc:
       # For everything after Rails3.2 we include the module into PostgreSQLAdapter in order to make
       # it compatible to Rails3.1
       # -- sergey.potapov 2012-06-25
-      if ActiveRecord::VERSION::STRING >= '3.2'
+      if ActiveRecord::VERSION::STRING >= '3.2' and ActiveRecord::VERSION::STRING < '4.2'
         include self::Utils
       end
 
@@ -17,6 +17,13 @@ module ActiveRecord # :nodoc:
       INDEX_COLUMN_EXPRESSION = /ON \w+(?: USING \w+ )?\((.+)\)/
       # Regex to find where clause in index statements
       INDEX_WHERE_EXPRESION = /WHERE (.+)$/
+      if ActiveRecord::VERSION::STRING >= '4.2' then
+        def extract_schema_and_table(name)
+          table, schema = name.scan(/[^".\s]+|"[^"]*"/)[0..1].collect{|m| m.gsub(/(^"|"$)/,'') }.reverse
+          [schema, table]
+        end
+      end
+
 
       # Returns an array of indexes for the given table.
       #
